@@ -299,7 +299,7 @@ func (s *Set[M]) RevRank(member M) (int, bool) {
 //
 // Range 适合只读遍历。不要在 fn 中修改当前 Set；插入、删除或更新 score 都可能改变
 // skip list 的 forward/backward 指针，使当前遍历过程跳过元素或重复访问元素。
-func (s *Set[M]) Range(fn func(M, float64) bool) {
+func (s *Set[M]) Range(fn func(member M, score float64) bool) {
 	if s == nil || s.header == nil || fn == nil {
 		return
 	}
@@ -317,7 +317,7 @@ func (s *Set[M]) Range(fn func(M, float64) bool) {
 //
 // ReverseRange 适合只读遍历。不要在 fn 中修改当前 Set；反向遍历依赖 bottom level
 // 的 backward 指针，遍历期间修改集合会让后续位置不再稳定。
-func (s *Set[M]) ReverseRange(fn func(M, float64) bool) {
+func (s *Set[M]) ReverseRange(fn func(member M, score float64) bool) {
 	if s == nil || fn == nil {
 		return
 	}
@@ -339,7 +339,7 @@ func (s *Set[M]) ReverseRange(fn func(M, float64) bool) {
 //
 // RangeByRank 会先用 span 定位 start 对应节点，再沿 bottom level 顺序遍历到 stop。
 // 定位成本为 O(log n)，遍历成本为 O(k)，k 为返回的元素数量。
-func (s *Set[M]) RangeByRank(start int, stop int, fn func(M, float64) bool) {
+func (s *Set[M]) RangeByRank(start int, stop int, fn func(member M, score float64) bool) {
 	if s == nil || s.header == nil || fn == nil {
 		return
 	}
@@ -364,7 +364,7 @@ func (s *Set[M]) RangeByRank(start int, stop int, fn func(M, float64) bool) {
 //
 // RevRangeByRank 会先把反向 rank 转成正向 1-based rank，再沿 backward 指针向前遍历。
 // 定位成本为 O(log n)，遍历成本为 O(k)。
-func (s *Set[M]) RevRangeByRank(start int, stop int, fn func(M, float64) bool) {
+func (s *Set[M]) RevRangeByRank(start int, stop int, fn func(member M, score float64) bool) {
 	if s == nil || fn == nil {
 		return
 	}
@@ -389,7 +389,7 @@ func (s *Set[M]) RevRangeByRank(start int, stop int, fn func(M, float64) bool) {
 //
 // RangeByScore 会先从最高层开始跳过所有 score < min 的节点，定位到第一个
 // score >= min 的节点后，再沿 bottom level 顺序扫描到 score > max。
-func (s *Set[M]) RangeByScore(min float64, max float64, fn func(M, float64) bool) {
+func (s *Set[M]) RangeByScore(min float64, max float64, fn func(member M, score float64) bool) {
 	if s == nil || s.header == nil || fn == nil || min > max {
 		return
 	}

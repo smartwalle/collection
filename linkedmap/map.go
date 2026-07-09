@@ -296,7 +296,7 @@ func (m *Map[K, V]) MoveAfter(key K, markKey K) bool {
 //
 // 遍历时会先保存 next 指针，再调用 fn。这样即使 fn 删除当前元素，
 // 遍历仍然可以继续走向原本的下一个元素。
-func (m *Map[K, V]) Range(fn func(K, V) bool) {
+func (m *Map[K, V]) Range(fn func(key K, value V) bool) {
 	if m == nil || fn == nil {
 		return
 	}
@@ -313,7 +313,7 @@ func (m *Map[K, V]) Range(fn func(K, V) bool) {
 //
 // fn 返回 false 时会立即停止遍历。
 // 如果 Map 为空、Map 为 nil 或 fn 为 nil，ReverseRange 不做任何操作。
-func (m *Map[K, V]) ReverseRange(fn func(K, V) bool) {
+func (m *Map[K, V]) ReverseRange(fn func(key K, value V) bool) {
 	if m == nil || fn == nil {
 		return
 	}

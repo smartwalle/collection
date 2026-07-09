@@ -295,7 +295,7 @@ func (m *Map[K, V]) GreaterEqual(key K) (K, V, bool) {
 //
 // 遍历使用 B-Tree 的中序遍历：先遍历左子树，再访问当前元素，
 // 最后遍历右子树，因此访问顺序就是 key 的升序。
-func (m *Map[K, V]) Range(fn func(K, V) bool) {
+func (m *Map[K, V]) Range(fn func(key K, value V) bool) {
 	if m == nil || m.root == nil || fn == nil {
 		return
 	}
@@ -309,7 +309,7 @@ func (m *Map[K, V]) Range(fn func(K, V) bool) {
 //
 // ReverseRange 是 Range 的反向版本，使用反向中序遍历：
 // 先遍历右子树，再访问当前元素，最后遍历左子树。
-func (m *Map[K, V]) ReverseRange(fn func(K, V) bool) {
+func (m *Map[K, V]) ReverseRange(fn func(key K, value V) bool) {
 	if m == nil || m.root == nil || fn == nil {
 		return
 	}
@@ -323,7 +323,7 @@ func (m *Map[K, V]) ReverseRange(fn func(K, V) bool) {
 //
 // RangeFrom 会先在树中定位 from key 应该出现的位置，
 // 然后从该位置开始继续做升序遍历。
-func (m *Map[K, V]) RangeFrom(key K, fn func(K, V) bool) {
+func (m *Map[K, V]) RangeFrom(key K, fn func(key K, value V) bool) {
 	if m == nil || m.root == nil || fn == nil {
 		return
 	}
@@ -337,7 +337,7 @@ func (m *Map[K, V]) RangeFrom(key K, fn func(K, V) bool) {
 //
 // RangeBetween 复用 RangeFrom 定位下界，然后在遍历过程中遇到 key > to 时停止。
 // 这样可以避免从树的最小元素开始全量扫描。
-func (m *Map[K, V]) RangeBetween(from K, to K, fn func(K, V) bool) {
+func (m *Map[K, V]) RangeBetween(from K, to K, fn func(key K, value V) bool) {
 	if m == nil || m.root == nil || fn == nil || cmp.Compare(from, to) > 0 {
 		return
 	}
@@ -814,7 +814,7 @@ func (n *node[K, V]) max() (element[K, V], bool) {
 // 对 B-Tree 节点来说，升序遍历顺序是：
 // child[0]、element[0]、child[1]、element[1]、...、最后一个 child。
 // fn 返回 false 时立即停止，并把 false 一路向上传递给调用方。
-func (n *node[K, V]) rangeAsc(fn func(K, V) bool) bool {
+func (n *node[K, V]) rangeAsc(fn func(key K, value V) bool) bool {
 	for i, item := range n.elements {
 		if len(n.children) > 0 {
 			if !n.children[i].rangeAsc(fn) {
@@ -835,7 +835,7 @@ func (n *node[K, V]) rangeAsc(fn func(K, V) bool) bool {
 //
 // 降序遍历与 rangeAsc 相反：
 // 先访问最后一个 child，再从后往前访问 element 和它左侧的 child。
-func (n *node[K, V]) rangeDesc(fn func(K, V) bool) bool {
+func (n *node[K, V]) rangeDesc(fn func(key K, value V) bool) bool {
 	if len(n.children) > 0 {
 		if !n.children[len(n.children)-1].rangeDesc(fn) {
 			return false
@@ -865,7 +865,7 @@ func (n *node[K, V]) rangeDesc(fn func(K, V) bool) bool {
 // 第一个下探子树仍然使用 rangeAscFrom，因为里面可能同时包含小于 key
 // 和大于等于 key 的元素；后续右侧子树已经整体大于当前 element，
 // 可以直接使用 rangeAsc 做完整遍历。
-func (n *node[K, V]) rangeAscFrom(key K, fn func(K, V) bool) bool {
+func (n *node[K, V]) rangeAscFrom(key K, fn func(key K, value V) bool) bool {
 	var index, _ = n.find(key)
 	if len(n.children) > 0 {
 		if !n.children[index].rangeAscFrom(key, fn) {
