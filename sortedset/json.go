@@ -82,7 +82,7 @@ func (s *Set[M]) MarshalJSON() ([]byte, error) {
 //
 // JSON 对象的 key 会被解析成 member，value 会被解析成 score。
 // JSON 对象字段的出现顺序不会影响 Set；反序列化后仍按 score/member 排序。
-// 这和 linkedmap 不同：sorted set 的顺序由 score/member 决定，而不是 JSON 字段顺序。
+// 这和 linked map 不同：sorted set 的顺序由 score/member 决定，而不是 JSON 字段顺序。
 //
 // 如果 JSON 中出现重复 member，后出现的 score 会覆盖先出现的 score，
 // 这和 Put 的覆盖语义保持一致。
